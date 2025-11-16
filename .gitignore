@@ -1,0 +1,19 @@
+# Environnements virtuels
+.venv/
+venv/
+env/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# VS Code settings
+.vscode/
+
+# Environment & secrets
+.env
+
+# Data (si tu stockes des fichiers volumineux)
+#data/
