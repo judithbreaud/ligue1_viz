@@ -28,6 +28,7 @@ def save_raw_matches(matches_json,folder_path="data/raw/"):
 
     with open(full_path, "w", encoding="utf-8") as f:
         json.dump(matches_json, f, indent=2, ensure_ascii=False)
+    return full_path
 
 
 def load_raw_matches(folder_path="data/raw/",competition_code="FL1",season_id=2025):
