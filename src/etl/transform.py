@@ -63,7 +63,7 @@ def classement_interactif(matches_json):
    )
 
    return df_long[[
-    "matchday", "team", 
+    "matchday", "team", "points",
     "points_cum", "gf_cum", "ga_cum", "gdif_cum",
     "wins_cum", "draws_cum", "losses_cum",
     "rank"
