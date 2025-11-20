@@ -1,0 +1,1 @@
+from .ranking_plots import compare_gdif, compare_ga, compare_gf, compare_points_total, compare_rank, compare_resultats
