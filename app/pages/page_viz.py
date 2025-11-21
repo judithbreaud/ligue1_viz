@@ -8,19 +8,20 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
-
+st.markdown("<style>div.block-container{padding-top:2rem;}</style>", unsafe_allow_html=True)
 st.title("Comparer les résultats de deux équipes de Ligue 1")
 df = pd.read_parquet("data/processed/standings_long.parquet")
 col1, col2 = st.columns(2)
 with col1:
     team_1 = st.selectbox(
         "Equipe 1",
-        df["team"].unique(),
+        sorted(df["team"].unique()),
+        index=16
     )
 with col2:
     team_2 = st.selectbox(
         "Equipe 2",
-        df["team"].unique(),
+        sorted(df["team"].unique()),
     )
 
 
