@@ -15,8 +15,8 @@ def compare_rank(standings_long, team_1, team_2,col1="red",col2="blue"):
     ax.invert_yaxis()
 
     # Ajouter des labels et un titre
-    ax.set_xlabel("Journée (matchday)")
-    ax.set_ylabel("Classement (rank)")
+    ax.set_xlabel("Journée")
+    ax.set_ylabel("Classement")
     ax.set_title(f"Évolution du classement : {team_1} vs {team_2}")
     ax.legend()
     ax.grid(True, linestyle="--", alpha=0.5)
@@ -39,7 +39,7 @@ def compare_points_total(standings_long, team_1, team_2,col1="red",col2="blue"):
     #plt.plot(df2["matchday"], df2["rank"], marker="o", label=team_2, color="tab:red")
     
     # Ajouter des labels et un titre
-    ax.set_xlabel("Journée (matchday)")
+    ax.set_xlabel("Journée")
     ax.set_ylabel("Points")
     ax.set_title(f"Points total : {team_1} vs {team_2}")
     ax.legend()
@@ -64,7 +64,7 @@ def compare_resultats(standings_long, team_1, team_2,col1="red",col2="blue"):
     #plt.plot(df2["matchday"], df2["rank"], marker="o", label=team_2, color="tab:red")
     
     # Ajouter des labels et un titre
-    ax.set_xlabel("Journée (matchday)")
+    ax.set_xlabel("Journée")
     ax.set_ylabel("Résultats (points)")
     ax.set_title(f"Résultats (points) : {team_1} vs {team_2}")
     ax.legend()
@@ -89,7 +89,7 @@ def compare_gf(standings_long, team_1, team_2,col1="red",col2="blue"):
     #plt.plot(df2["matchday"], df2["rank"], marker="o", label=team_2, color="tab:red")
     
     # Ajouter des labels et un titre
-    ax.set_xlabel("Journée (matchday)")
+    ax.set_xlabel("Journée")
     ax.set_ylabel("Buts marqués")
     ax.set_title(f"Buts marqués (cumulés) : {team_1} vs {team_2}")
     ax.legend()
@@ -114,7 +114,7 @@ def compare_ga(standings_long, team_1, team_2,col1="red",col2="blue"):
     ax.invert_yaxis()
 
     # Ajouter des labels et un titre
-    ax.set_xlabel("Journée (matchday)")
+    ax.set_xlabel("Journée")
     ax.set_ylabel("Buts encaissés")
     ax.set_title(f"Buts encaissés (cumulés) : {team_1} vs {team_2}")
     ax.legend()
@@ -138,7 +138,7 @@ def compare_gdif(standings_long, team_1, team_2,col1="red",col2="blue"):
     #plt.plot(df2["matchday"], df2["rank"], marker="o", label=team_2, color="tab:red")
     
     # Ajouter des labels et un titre
-    ax.set_xlabel("Journée (matchday)")
+    ax.set_xlabel("Journée")
     ax.set_ylabel("Goal average")
     ax.set_title(f"Goal average : {team_1} vs {team_2}")
     ax.legend()
