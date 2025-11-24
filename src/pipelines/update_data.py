@@ -4,7 +4,7 @@ from src.etl import fetch_matches, save_raw_matches, classement_interactif
 import pandas as pd
 import os
 
-COMPETITION_ID=2015 #ligue 1
+COMPETITION_ID="FL1" #ligue 1
 SEASON_ID="2025"
 
 def main():
