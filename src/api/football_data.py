@@ -37,6 +37,7 @@ def api_get(path, params=None, base=BASE_URL, timeout=10):
     print(f"[DEBUG] Token prefix: {token[:5]}***")
 
     headers = {"X-Auth-Token": token}
+    print(f"[DEBUG] params: {params}")
 
     url = base.rstrip("/") + "/" + path.lstrip("/")
     print(f"[DEBUG] URL called: {url}")
