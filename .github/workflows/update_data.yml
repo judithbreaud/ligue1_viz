@@ -57,4 +57,4 @@ jobs:
           git remote remove origin || echo "No origin to remove"
           git remote add origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
           git commit -m "Auto-update data [skip ci]" || echo "Aucun changement à commit"
-          git push
+          git push --set-upstream origin main
