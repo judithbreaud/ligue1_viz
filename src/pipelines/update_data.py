@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+load_dotenv()
 from src.etl import fetch_matches, save_raw_matches, classement_interactif
 import pandas as pd
 import os
