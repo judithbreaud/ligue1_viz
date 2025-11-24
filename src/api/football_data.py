@@ -4,7 +4,7 @@ import requests
 import json
 
 # Charge le .env si présent (utile en local)
-load_dotenv()
+#load_dotenv()
 
 # Récupère la clé depuis l'environnement
 API_TOKEN = os.getenv("FOOTBALL_DATA_TOKEN")
