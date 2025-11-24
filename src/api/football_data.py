@@ -1,47 +1,41 @@
-# Cellule: imports et chargement de la clé API depuis .env
 import os
-from dotenv import load_dotenv   # charge les variables d'environnement depuis un fichier .env
-import requests                 # pour les appels HTTP
-#import pandas as pd             # manipulation de données tabulaires
-import json                     # pour afficher proprement le JSON si besoin
+from dotenv import load_dotenv
+import requests
+import json
 
-# Charge les variables d'environnement depuis le fichier .env (s'il existe).
+# Charge le .env si présent (utile en local)
 load_dotenv()
 
+# Récupère la clé depuis l'environnement
+API_TOKEN = os.getenv("FOOTBALL_DATA_TOKEN")
 
-def get_api_token():
-    token = os.getenv("FOOTBALL_DATA_TOKEN")
-    if not token:
-        raise RuntimeError("FOOTBALL_DATA_TOKEN absent. "
-                           "En local : créer un .env. "
-                           "Sur GitHub : ajouter dans Secrets.")
-    return token
+# Debug : vérifie que la variable est bien lue
+if not API_TOKEN:
+    raise RuntimeError("Clé API non trouvée. Vérifie la variable d'environnement FOOTBALL_DATA_TOKEN")
 
-
-# Base URL pour football-data.org (version v4)
+# Base URL
 BASE_URL = "https://api.football-data.org/v4"
 
-# Optionnel : petite info pour l'utilisateur
-print("Clé API chargée. Base:", BASE_URL)
+# Prépare le header
+HEADERS = {"X-Auth-Token": API_TOKEN}
 
-def api_get(path, params=None, base=BASE_URL, timeout=10):
-    """
-    Effectue une requête GET sur base + path, retourne le JSON décodé.
-    - path : chemin après la base (ex: "/competitions/2021/standings")
-    - params : dict de query params (facultatif)
-    """
-    token = get_api_token()
+print("== DEBUG API ==")
+print(f"[DEBUG] Token length: {len(API_TOKEN)}")
+print(f"[DEBUG] Token prefix: {API_TOKEN[:6]}***")
+print(f"[DEBUG] Headers prepared: {HEADERS}")
 
-    # 🔍 DEBUG : afficher longueur et début du token
-    print(f"[DEBUG] Token length: {len(token)}")
-    print(f"[DEBUG] Token prefix: {token[:5]}***")
-
-    headers = {"X-Auth-Token": token}
-    print(f"[DEBUG] params: {params}")
-
+def api_get(path, params=None, base=BASE_URL, headers=HEADERS, timeout=10):
     url = base.rstrip("/") + "/" + path.lstrip("/")
     print(f"[DEBUG] URL called: {url}")
-
+    print(f"[DEBUG] Params: {params}")
+    print(f"[DEBUG] Headers: {headers}")
+    
     r = requests.get(url, headers=headers, params=params, timeout=timeout)
-    r.raise_for_status()
+    
+    try:
+        r.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        print(f"[ERROR] Status code: {r.status_code}, response: {r.text}")
+        raise e
+    
     return r.json()
