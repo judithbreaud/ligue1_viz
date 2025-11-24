@@ -5,7 +5,7 @@ import pandas as pd
 import os
 
 COMPETITION_ID=2015 #ligue 1
-SEASON_ID=2025
+SEASON_ID="2025"
 
 def main():
     print("== Fetching data from API ==")
