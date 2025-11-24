@@ -55,6 +55,6 @@ jobs:
           git add data/
           # Modifier l'URL du remote pour inclure le token
           git remote remove origin || echo "No origin to remove"
-          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+          git remote add origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
           git commit -m "Auto-update data [skip ci]" || echo "Aucun changement à commit"
           git push
