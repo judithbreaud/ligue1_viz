@@ -13,26 +13,43 @@ jobs:
       FOOTBALL_DATA_TOKEN: ${{ secrets.FOOTBALL_DATA_TOKEN }}
 
     steps:
+      # 1. Checkout du repo
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2. Setup Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
+      # 3. Install requirements
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run update pipeline
-        run: python -m src.pipelines.update_data
+      # 🔍 4. DIAGNOSTIC → Vérifier que le token est bien transmis
+      - name: Debug environment variable
+        run: |
+          echo "Longueur du token : ${#FOOTBALL_DATA_TOKEN}"
+          if [ -z "$FOOTBALL_DATA_TOKEN" ]; then
+            echo "ERREUR : FOOTBALL_DATA_TOKEN est VIDE !"
+            exit 1
+          else
+            echo "FOOTBALL_DATA_TOKEN chargé correctement (contenu masqué)."
+          fi
 
+      # 5. Lancer la pipeline
+      - name: Run update pipeline
+        run: |
+          python -m src.pipelines.update_data
+
+      # 6. Commit + push des fichiers modifiés
       - name: Commit & Push updated data
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           git add data/
-          git commit -m "Auto-update data [skip ci]" || echo "No changes to commit"
+          git commit -m "Auto-update data [skip ci]" || echo "Aucun changement à commit"
           git push
