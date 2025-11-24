@@ -31,11 +31,16 @@ def api_get(path, params=None, base=BASE_URL, timeout=10):
     - params : dict de query params (facultatif)
     """
     token = get_api_token()
+
+    # 🔍 DEBUG : afficher longueur et début du token
+    print(f"[DEBUG] Token length: {len(token)}")
+    print(f"[DEBUG] Token prefix: {token[:5]}***")
+
     headers = {"X-Auth-Token": token}
-    url = base.rstrip("/") + "/" + path.lstrip("/")  # construit correctement l'URL
-    # 1) On envoie la requête
+
+    url = base.rstrip("/") + "/" + path.lstrip("/")
+    print(f"[DEBUG] URL called: {url}")
+
     r = requests.get(url, headers=headers, params=params, timeout=timeout)
-    # 2) Si le statut n'est pas 200, raise_for_status déclenche une exception HTTPError
     r.raise_for_status()
-    # 3) Retourne la réponse décodée en JSON (sous forme de dict / list selon la réponse)
     return r.json()
