@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 load_dotenv()
-from src.etl import fetch_matches, save_raw_matches, classement_interactif
+from src.etl import fetch_matches, save_raw_matches, classement_interactif, find_next_opponent,save_next_opponent
 import pandas as pd
 import os
 
@@ -24,6 +24,12 @@ def main():
 
     print(f"== Saving processed data to {processed_path} ==")
     df.to_parquet(processed_path, index=False)
+    
+    print("== Finding next opponent ==")
+    opponent=find_next_opponent(matches_json)
+    save_next_opponent(opponent_name=opponent)
+
+
 
     print("Done.")
 
