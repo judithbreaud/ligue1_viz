@@ -68,3 +68,15 @@ def classement_interactif(matches_json):
     "wins_cum", "draws_cum", "losses_cum",
     "rank"
    ]].sort_values(["matchday","rank"])
+
+def find_next_opponent(matches_json,team1):
+    #from the json request from the API, finds the next opponent of team1
+    matches_list = matches_json["matches"]
+    df_matches = pd.json_normalize(matches_list)
+    #restriction to finished games and the important columns
+    df_short=df_matches[df_matches.status!="FINISHED"][["matchday","homeTeam.name","awayTeam.name"]]
+    one_match=df_short[(df_short.matchday==df_short.matchday.min())&((df_short["awayTeam.name"]==team1)|(df_short["homeTeam.name"]==team1))]
+    if one_match["homeTeam.name"].iloc[0]==team1:
+        return one_match["awayTeam.name"].iloc[0]
+    else:
+        return one_match["homeTeam.name"].iloc[0]
