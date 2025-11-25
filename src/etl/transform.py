@@ -1,5 +1,5 @@
 import pandas as pd
-
+import json
 def pts(row):
     #return the points in a football game utilitary function for classement_interactif
 
@@ -68,3 +68,35 @@ def classement_interactif(matches_json):
     "wins_cum", "draws_cum", "losses_cum",
     "rank"
    ]].sort_values(["matchday","rank"])
+
+def find_next_opponent(matches_json,team1="Stade Rennais FC 1901"):
+    #from the json request from the API, finds the next opponent of team1
+    matches_list = matches_json["matches"]
+    df= pd.json_normalize(matches_list)
+    #restriction to unplayed games
+    df_next = df[df["status"] != "FINISHED"]
+    if df_next.empty:
+        return None  # Aucun match à venir
+    
+    # prochain match (min matchday)
+    md = df_next["matchday"].min()
+
+    # match correspondant à l'équipe
+    m = df_next[
+        (df_next["matchday"] == md) &
+        ((df_next["homeTeam.name"] == team1) | (df_next["awayTeam.name"] == team1))
+    ]
+
+    if m.empty:
+        return None  # erreur ou bye
+
+    home = m["homeTeam.name"].iloc[0]
+    away = m["awayTeam.name"].iloc[0]
+
+    return away if home == team1 else home
+
+
+def save_next_opponent(opponent_name: str, team_name="Stade Rennais FC 1901", output_path="data/processed/next_opponent.json"):
+    obj = {"team":team_name,"next_opponent": opponent_name}
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(obj, f, ensure_ascii=False, indent=2)

@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import sys
 import os
-
+import json
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 
@@ -11,17 +11,22 @@ if ROOT_DIR not in sys.path:
 st.markdown("<style>div.block-container{padding-top:2rem;}</style>", unsafe_allow_html=True)
 st.title("Comparer les résultats de deux équipes de Ligue 1")
 df = pd.read_parquet("data/processed/standings_long.parquet")
+with open("data/processed/next_opponent.json", "r", encoding="utf-8") as f:
+    obj = json.load(f)
+
+next_opponent = obj["next_opponent"]
 col1, col2 = st.columns(2)
 with col1:
     team_1 = st.selectbox(
         "Equipe 1",
         sorted(df["team"].unique()),
-        index=16
+        index=sorted(df["team"].unique()).index("Stade Rennais FC 1901")
     )
 with col2:
     team_2 = st.selectbox(
         "Equipe 2",
         sorted(df["team"].unique()),
+        index=sorted(df["team"].unique()).index(next_opponent)
     )
 
 

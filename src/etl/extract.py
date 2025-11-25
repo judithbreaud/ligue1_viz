@@ -38,4 +38,4 @@ def load_raw_matches(folder_path="data/raw/",competition_code="FL1",season_id=20
     filename = f"{competition_code}_{season_id}.json"
     full_path = os.path.join(folder_path, filename)
     with open(full_path, "r", encoding="utf-8") as f:
-        json.load(f)
+        return json.load(f)
