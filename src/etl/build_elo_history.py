@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 load_dotenv()
-from src.features import initialize_elos, reset_elos_between_seasons, expected_score,update_elo,compute_elo_for_season
+from src.features import initialize_elos, reset_elos_between_seasons, expected_score,update_elo,compute_elo_for_season, build_linear_elo_from_ranking
 from src.etl import load_raw_matches
 import pandas as pd
 import os
@@ -12,6 +12,8 @@ def main():
     matches_23=load_raw_matches(season_id=2023)
     matches_24=load_raw_matches(season_id=2024)
     matches_25=load_raw_matches(season_id=2025)
+    rank_22_23 = pd.read_parquet("data/processed/ranking_22_23.parquet")
+
     print("== Data into panda ==")
     df_matches_23 = pd.json_normalize(matches_23["matches"])
     
@@ -20,10 +22,17 @@ def main():
     df_matches_25 = df_matches_25_temp[df_matches_25_temp.status=="FINISHED"]
 
     print("== Saison 23-24 ==")
-    elos_2324_start = initialize_elos(
-    teams=df_matches_23["homeTeam.tla"].unique(),
-    promoted_teams=["HAC", "FCM"]  # exemples
+    elos_2324_start = build_linear_elo_from_ranking(
+    rank_22_23,
+    team_col="team_tla",
+    rank_col="team_rank",
+    top_elo=1700,
+    bottom_elo=1330,
+    promoted_teams=["HAC","FCM"]
     )
+    print(elos_2324_start.keys)
+    print(df_matches_23["homeTeam.tla"].unique())
+
     history_2324, elos_end_2324 = compute_elo_for_season(df_matches_23, elos_2324_start)
     print("== Saison 24-25 ==")
     elos_2425_start = reset_elos_between_seasons(elos_end_2324,promoted_teams=["AJA","ANG","ASS"])
