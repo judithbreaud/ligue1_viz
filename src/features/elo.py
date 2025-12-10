@@ -2,6 +2,60 @@ import pandas as pd
 import numpy as np
 
 
+
+def build_linear_elo_from_ranking(
+    rank_df,
+    team_col="team_tla",
+    rank_col="rank",
+    top_elo=1700,
+    bottom_elo=1330,
+    promoted_teams=None,
+    promoted_elo=None
+):
+    """
+    rank_df: DataFrame with columns [rank_col, team_col], rank 1..N (1 is champion)
+    promoted_teams: list of TLA that are promoted for the target season
+    promoted_elo: if provided, use this value for promoted teams (else set slightly under bottom_elo)
+    Returns: pd.DataFrame with columns [team, init_elo]
+    """
+
+    df = rank_df[[rank_col, team_col]].copy()
+    df = df.sort_values(rank_col).reset_index(drop=True)
+    df[rank_col] = df[rank_col].astype(int)
+
+    N = df[rank_col].max()
+    if N < 2:
+        raise ValueError("Au moins 2 équipes attendues dans rank_df")
+
+    # We fix rank 1 to top_elo.
+    # For ranks 2..N we linearly interpolate between second_elo and bottom_elo.
+    ranks_1_to_N = np.arange(1, N+1)
+    linear_vals = np.linspace(top_elo, bottom_elo, len(ranks_1_to_N))
+
+    elo_map = {}
+
+    # Ranks 1..N
+    for r, val in zip(ranks_1_to_N, linear_vals):
+        team = df.loc[df[rank_col] == r, team_col].values
+        if len(team) == 0:
+            continue
+        elo_map[team[0]] = float(val)
+
+    # Promoted teams handling
+    if promoted_teams is None:
+        promoted_teams = []
+
+    if promoted_elo is None:
+        # put them slightly under bottom_elo
+        promoted_elo = float(bottom_elo - 20)
+
+    for t in promoted_teams:
+        elo_map[t] = float(promoted_elo)
+
+    return elo_map
+
+
+
 def initialize_elos(teams, promoted_teams=None, base_elo=1500, promoted_elo=1450):
     """
     Initialise le rating Elo des équipes en début de saison.
@@ -29,8 +83,10 @@ def reset_elos_between_seasons(previous_elos, promoted_teams=None, alpha=0.75, b
     elos={team: alpha * rating + (1 - alpha) * base_elo
         for team, rating in previous_elos.items()}
     
+    weakest = min(elos.values())
+
     for t in promoted_teams:
-        elos[t] = 1450
+        elos[t] = weakest-20
     
     return elos
 
