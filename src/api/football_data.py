@@ -7,11 +7,12 @@ import json
 #load_dotenv()
 
 # Récupère la clé depuis l'environnement
-API_TOKEN = os.getenv("FOOTBALL_DATA_TOKEN", "").strip()
-if not API_TOKEN:
-    raise ValueError("FOOTBALL_DATA_TOKEN n'est pas défini")
 
 def api_get(path, params=None, timeout=10):
+    API_TOKEN = os.getenv("FOOTBALL_DATA_TOKEN", "").strip()
+    if not API_TOKEN:
+        raise ValueError("FOOTBALL_DATA_TOKEN n'est pas défini")
+
     # Base URL
     base = "https://api.football-data.org/v4"
 

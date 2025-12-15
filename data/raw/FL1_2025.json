@@ -379,12 +379,12 @@
         "name": "AJ Auxerre",
         "shortName": "Auxerre",
         "tla": "AJA",
-        "crest": "https://crests.football-data.org/519.png"
+        "crest": "https://crests.football-data.org/519.png" 
       },
       "awayTeam": {
         "id": 525,
         "name": "FC Lorient",
-        "shortName": "Lorient",
+    "shortName": "Lorient",
         "tla": "FCL",
         "crest": "https://crests.football-data.org/525.png"
       },
@@ -439,7 +439,7 @@
       "matchday": 1,
       "stage": "REGULAR_SEASON",
       "group": null,
-      "lastUpdated": "2025-12-15T00:20:53Z",
+    "lastUpdated": "2025-12-15T00:20:53Z",
       "homeTeam": {
         "id": 545,
         "name": "FC Metz",
@@ -9656,6 +9656,7 @@
         "id": 2420,
         "startDate": "2025-08-17",
         "endDate": "2026-05-16",
+
         "currentMatchday": 16,
         "winner": null
       },
