@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 load_dotenv()
-from src.features import initialize_elos, reset_elos_between_seasons, expected_score,update_elo,compute_elo_for_season, build_linear_elo_from_ranking
+from src.features import initialize_elos, reset_elos_between_seasons, expected_score,update_elo,compute_elo_for_season, build_linear_elo_from_ranking,append_future_matchday_elos
 from src.etl import load_raw_matches
 import pandas as pd
 import os
@@ -40,7 +40,18 @@ def main():
     print("== Saison 25-26 ==")
     elos_2526_start = reset_elos_between_seasons(elos_end_2425,promoted_teams=["FCL","PFC","FCM"])
     history_2526, elos_end_2526 = compute_elo_for_season(df_matches_25, elos_2526_start)
-    
+    last_md = df_matches_25["matchday"].max()
+    next_md = last_md + 1
+    season_2526 = df_matches_25["season.startDate"].iloc[0]
+
+    history_2526 = append_future_matchday_elos(
+        history_2526,
+        elos_end_2526,
+        season=season_2526,
+        next_matchday=next_md
+    )
+
+
     print("== Concaténer ==")
     elo_history = pd.concat([history_2324, history_2425, history_2526])
     
