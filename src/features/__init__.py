@@ -1,1 +1,3 @@
-from .elo import initialize_elos,reset_elos_between_seasons,expected_score,update_elo,compute_elo_for_season,build_linear_elo_from_ranking
+from .elo import initialize_elos,reset_elos_between_seasons,expected_score,update_elo,compute_elo_for_season
+from .elo import build_linear_elo_from_ranking, append_future_matchday_elos,update_elo_history_with_matchday
+from .match__feature_pred import prepare_match_features, match_features_train, match_features_pred
