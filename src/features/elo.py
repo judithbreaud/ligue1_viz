@@ -231,3 +231,12 @@ def update_elo_history_with_matchday(
     future_df = pd.DataFrame(rows)
 
     return pd.concat([elo_history, future_df], ignore_index=True)
+
+
+def elo_dict_to_df(elo_dict):
+    return (
+        pd.DataFrame(
+            elo_dict.items(),
+            columns=["team_tla", "elo"]
+        )
+    )

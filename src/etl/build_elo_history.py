@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 load_dotenv()
-from src.features import initialize_elos, reset_elos_between_seasons, expected_score,update_elo,compute_elo_for_season, build_linear_elo_from_ranking,append_future_matchday_elos
+from src.features import initialize_elos, reset_elos_between_seasons, expected_score,update_elo,compute_elo_for_season, build_linear_elo_from_ranking,append_future_matchday_elos, elo_dict_to_df
 from src.etl import load_raw_matches
 import pandas as pd
 import os
@@ -50,6 +50,9 @@ def main():
         season=season_2526,
         next_matchday=next_md
     )
+    elos_end_2526_df = elo_dict_to_df(
+    elos_end_2526
+    )
 
 
     print("== Concaténer ==")
@@ -62,6 +65,9 @@ def main():
 
     print(f"== Saving processed data to {processed_path} ==")
     elo_history.to_parquet(processed_path, index=False)
+
+    elos_end_path = "data/processed/last_elo.parquet"
+    elos_end_2526_df.to_parquet(elos_end_path, index=False)
 
     print("Done.")
 
