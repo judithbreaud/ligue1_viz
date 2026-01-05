@@ -51,7 +51,7 @@ def main():
         next_matchday=next_md
     )
     elos_end_2526_df = elo_dict_to_df(
-    elos_end_2526
+    elos_end_2526,season_2526,next_md
     )
 
 

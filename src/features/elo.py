@@ -233,10 +233,10 @@ def update_elo_history_with_matchday(
     return pd.concat([elo_history, future_df], ignore_index=True)
 
 
-def elo_dict_to_df(elo_dict):
+def elo_dict_to_df(elo_dict, season, matchday):
     return (
         pd.DataFrame(
             elo_dict.items(),
             columns=["team_tla", "elo"]
-        )
+        ).assign(season=season,matchday=matchday)
     )
