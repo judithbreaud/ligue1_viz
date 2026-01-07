@@ -182,4 +182,6 @@ def match_features_pred(df_matches,elo_df,select_matchday):
        "dif_elo_before","away_elo_before"]]
     y=df_for_model["score.winner"]
     label=df_for_model[['matchday','homeTeam.name','awayTeam.name']]
+    label["game_name"]=label["homeTeam.name"]+" / "+label["awayTeam.name"]
+
     return X,y,label
