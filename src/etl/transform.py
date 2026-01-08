@@ -97,6 +97,31 @@ def find_next_opponent(matches_json,team1="Stade Rennais FC 1901"):
 
 
 def save_next_opponent(opponent_name: str, team_name="Stade Rennais FC 1901", output_path="data/processed/next_opponent.json"):
+
     obj = {"team":team_name,"next_opponent": opponent_name}
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(obj, f, ensure_ascii=False, indent=2)
+
+
+def display_prediction(df_pred,game_name):
+    """
+    à partir des prédictions de matchs chargées depuis data/processed/next_matchday_prediction df_pred
+    avec un nom de match game_name qui est contenu dans df_pred
+    Retourne un tableau propre pour le streamlit avec la probabilité de victoire de l'équipe domicile, de nulle et de l'équipe extérieur
+    """
+    df = df_pred[df_pred['game_name'] == game_name]
+    home = df.iloc[0]['homeTeam.name']
+    away = df.iloc[0]['awayTeam.name']
+
+    res = (df[['HOME_TEAM', 'DRAW', 'AWAY_TEAM']].rename(
+        columns={
+            'HOME_TEAM': f'{home}',
+            'DRAW': 'Match nul',
+            'AWAY_TEAM': f'{away}'
+        }
+    )
+    .mul(100)
+    .round(1)
+    .astype(str)
+    .add('%'))
+    return res
