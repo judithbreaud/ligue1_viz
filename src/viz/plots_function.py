@@ -1,4 +1,7 @@
 import matplotlib.pyplot as plt
+import plotly.express as px
+import plotly.io as pio
+import pandas as pd
 def compare_rank(standings_long, team_1, team_2,col1="red",col2="blue"):
     """plots the rankings of team_1 and team_2
     """
@@ -144,4 +147,37 @@ def compare_gdif(standings_long, team_1, team_2,col1="red",col2="blue"):
     ax.legend()
     ax.grid(True, linestyle="--", alpha=0.5)
     
+    return fig
+
+def vizualisation_prediction(df):
+    '''une visualisation plotly des prédictions'''
+    df_home=df.copy()
+    df_home["Issue"]="Domicile"
+    df_home["proba"]=round(df_home["HOME_TEAM"]*100,1)
+    df_draw=df.copy()
+    df_draw["Issue"]="Nul"
+    df_draw["proba"]=round(100*df_home["DRAW"],1)
+    df_away=df.copy()
+    df_away["Issue"]="Exterieur"
+    df_away["proba"]=round(100*df_home["AWAY_TEAM"],1)
+
+    df_long=pd.concat([df_home,df_draw,df_away])
+    df_long.drop(columns=["AWAY_TEAM","DRAW","HOME_TEAM"],inplace=True)
+    df_long.sort_values(by="game_name",inplace=True)
+    fig = px.bar(
+        df_long,
+        x="proba",
+        y="game_name",
+        color="Issue",
+        orientation="h",
+        category_orders={
+        "Issue": ["Domicile", "Nul", "Exterieur"]
+    },
+        color_discrete_map={
+        "Domicile":  "#1042A7", 
+        "Nul":       "#A7A7A7",  # gris
+        "Exterieur": "#810191"  
+    },
+    labels={"game_name":"Match","proba":"Probabilité (%)"}
+    )
     return fig
