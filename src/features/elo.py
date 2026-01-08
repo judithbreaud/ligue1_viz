@@ -163,3 +163,80 @@ def compute_elo_for_season(df_matches, elos_start):
         elos[ht], elos[at] = new_ht, new_at
 
     return pd.DataFrame(history), elos
+
+
+def append_future_matchday_elos(
+    elo_history: pd.DataFrame,
+    elos_end: dict,
+    season,
+    next_matchday
+):
+    """
+    Ajoute une ligne par équipe correspondant à l'Elo
+    avant la prochaine journée (J+1)
+    """
+    rows = []
+
+    for team, elo in elos_end.items():
+        rows.append({
+            "season": season,
+            "matchday": next_matchday,
+            "team": team,
+            "elo_before": elo
+        })
+
+    future_df = pd.DataFrame(rows)
+    return pd.concat([elo_history, future_df], ignore_index=True)
+
+
+def update_elo_history_with_matchday(
+    elo_history: pd.DataFrame,
+    df_matchday_results: pd.DataFrame,
+):
+    """
+    Met à jour l'historique Elo avec UNE journée supplémentaire
+    """
+
+    # dernière journée connue
+    last_md = elo_history["matchday"].max()
+    season = elo_history["season"].iloc[-1]
+
+    # elos avant cette journée
+    elos_before = (
+        elo_history[(elo_history["matchday"] == last_md) & (elo_history["season"] == season)]
+        .set_index("team")["elo_before"]
+        .to_dict()
+    )
+
+   # Appliquer les matchs de la journée J
+    elos = elos_before.copy()
+
+    for _, row in df_matchday_results.iterrows():
+        ht, at = row["homeTeam.tla"], row["awayTeam.tla"]
+        gh, ga = row["score.fullTime.home"], row["score.fullTime.away"]
+
+        new_ht, new_at = update_elo(elos[ht], elos[at], gh, ga)
+        elos[ht], elos[at] = new_ht, new_at
+
+    # Ajouter UNIQUEMENT l'Elo avant J+1
+    rows = []
+    for team, elo in elos.items():
+        rows.append({
+            "season": season,
+            "matchday": last_md + 1,
+            "team": team,
+            "elo_before": elo
+        })
+
+    future_df = pd.DataFrame(rows)
+
+    return pd.concat([elo_history, future_df], ignore_index=True)
+
+
+def elo_dict_to_df(elo_dict, season, matchday):
+    return (
+        pd.DataFrame(
+            elo_dict.items(),
+            columns=["team_tla", "elo"]
+        ).assign(season=season,matchday=matchday)
+    )
