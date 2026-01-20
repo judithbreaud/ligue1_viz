@@ -198,8 +198,8 @@ def update_elo_history_with_matchday(
     """
 
     # dernière journée connue
-    last_md = elo_history["matchday"].max()
     season = elo_history["season"].iloc[-1]
+    last_md = elo_history[elo_history["season"]==season]["matchday"].max()
 
     # elos avant cette journée
     elos_before = (
@@ -230,7 +230,7 @@ def update_elo_history_with_matchday(
 
     future_df = pd.DataFrame(rows)
 
-    return pd.concat([elo_history, future_df], ignore_index=True)
+    return pd.concat([elo_history, future_df], ignore_index=True),elos
 
 
 def elo_dict_to_df(elo_dict, season, matchday):
