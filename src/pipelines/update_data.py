@@ -58,12 +58,6 @@ def main():
         print(f"== Saving processed data to {processed_path} ==")
         new_history_elo.to_parquet(processed_path, index=False)
 
-        elos_end_path = "data/processed/last_elo.parquet"
-        elos_end_df = elo_dict_to_df(
-            elos_end,df_matches_25,last_finished_md+1
-            )
-        elos_end_df.to_parquet(elos_end_path, index=False)
-        
         X_pred,y_none,label_pred=match_features_pred(df_matches_25,new_history_elo,last_finished_md+1) 
 
         print("== Import model ==")
