@@ -6,6 +6,7 @@ st.set_page_config(
 )
 create_page = st.Page("pages/page_viz.py", title="Visualisation",icon=":material/show_chart:")
 delete_page = st.Page("pages/page_pred.py", title="Prediction",icon=":material/cognition:")
+new_page = st.Page("pages/page_monte_carlo.py", title="End of season prediction",icon=":material/cognition:")
 
-pg = st.navigation([create_page, delete_page])
+pg = st.navigation([delete_page,new_page,create_page])
 pg.run()
