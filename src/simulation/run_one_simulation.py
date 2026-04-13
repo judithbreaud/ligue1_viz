@@ -1,3 +1,6 @@
+import pandas as pd
+import numpy as np
+from src.etl import pts
 def run_one_simulation(probas,classes,unplayed,played,old_goal_dif):
     unplayed = unplayed.copy()
 
