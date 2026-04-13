@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.io as pio
 import pandas as pd
+import plotly.graph_objects as go
+
 def compare_rank(standings_long, team_1, team_2,col1="red",col2="blue"):
     """plots the rankings of team_1 and team_2
     """
@@ -181,3 +183,102 @@ def vizualisation_prediction(df):
     labels={"game_name":"Match","proba":"Probabilité (%)"}
     )
     return fig
+
+
+
+def plot_rank_distribution(rank_probs, teams, title, xlim=(1, 18)):
+
+    fig, ax = plt.subplots()
+
+    for team in teams:
+        ax.plot(
+            rank_probs.columns,
+            rank_probs.loc[team],
+            marker='o',
+            linestyle='-',
+            label=team
+        )
+
+    ax.set_xlabel("Classement")
+    ax.set_ylabel("Probabilité")
+    ax.set_title(title)
+    ax.legend()
+    ax.grid()
+
+    ax.set_xlim(*xlim)
+    ax.set_ylim(0, 100)
+
+    return fig
+
+def plot_rank_distribution_plotly(rank_probs, teams, title):
+
+    fig = go.Figure()
+
+    x_vals = rank_probs.columns.astype(int)
+
+    # keep only selected teams
+    sub = rank_probs.loc[teams]
+
+    # dynamic range based on where probabilities exist
+    mask = sub.sum(axis=0) > 0
+    x_vals = x_vals[mask.values]
+
+    x_min, x_max = x_vals.min(), x_vals.max()
+
+    for team in teams:
+        fig.add_trace(
+            go.Scatter(
+                x=rank_probs.columns.astype(int),
+                y=rank_probs.loc[team],
+                mode='lines+markers',
+                name=team
+            )
+        )
+
+    fig.update_layout(
+        title=title,
+        xaxis_title="Classement",
+        yaxis_title="Probabilité",
+        xaxis=dict(range=[x_min, x_max]),
+        yaxis=dict(range=[0, 100]),
+        template="plotly_white"
+    )
+
+    return fig
+
+def get_teams_by_zone(rank_probs, threshold=0.05):
+    top7_prob = rank_probs.loc[:, 1:7].sum(axis=1)
+    teams_top7 = top7_prob.sort_values(ascending=False)
+    teams_top7 = teams_top7[teams_top7 > threshold].index.tolist()
+    bottom3_prob = rank_probs.loc[:, 16:18].sum(axis=1)
+    teams_bottom3 = bottom3_prob.sort_values(ascending=False)
+    teams_bottom3 = teams_bottom3[teams_bottom3 > threshold].index.tolist()
+
+    teams_other = rank_probs.index.difference(
+        set(teams_top7).union(set(teams_bottom3))
+    ).tolist()
+
+    return teams_top7, teams_bottom3, teams_other
+
+def plot_all_zones(rank_probs):
+    teams_top7, teams_bottom3, teams_other = get_teams_by_zone(rank_probs)
+
+    fig_top = plot_rank_distribution_plotly(
+        rank_probs,
+        teams_top7,
+        "Probabilité Top 7"
+    )
+
+    fig_bottom = plot_rank_distribution_plotly(
+        rank_probs,
+        teams_bottom3,
+        "Probabilité Relégation (Bottom 3)"
+    )
+
+    fig_other = plot_rank_distribution_plotly(
+        rank_probs,
+        teams_other,
+        "Autres équipes"
+    )
+
+    return fig_top, fig_bottom, fig_other
