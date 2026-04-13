@@ -4,7 +4,9 @@ from src.etl import fetch_matches, save_raw_matches, classement_interactif, find
 import pandas as pd
 import os
 from src.features import match_features_pred, update_elo_history_with_matchday,elo_dict_to_df
+from src.simulation import run_monte_carlo, compute_rank_probabilities
 from src.etl import load_raw_matches
+from src.simulation import run_season_monte_carlo
 import joblib
 
 COMPETITION_ID="FL1" #ligue 1
@@ -84,6 +86,25 @@ def main():
     else: 
         #there is an error 
         print("There is an error")
+    
+    
+    print("== Monte carlo prediction ==")
+
+    model = joblib.load("models/match_prediction_MC")
+
+    rank_probs = run_season_monte_carlo(
+        df_matches=df_matches_25,
+        elo_history=new_history_elo,
+        model=model,
+        standings_path="data/processed/standings_long.parquet",
+        n_simulations=10000
+    )
+
+    rank_probs.to_parquet(
+        "data/processed/monte_carlo_rank_probs.parquet"
+    )
+
+
 
     print("Done.")
 
