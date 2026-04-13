@@ -86,7 +86,7 @@ def main():
     else: 
         #there is an error 
         print("There is an error")
-    
+        new_history_elo=history_elo
     
     print("== Monte carlo prediction ==")
 
