@@ -1,5 +1,5 @@
 from src.simulation import run_one_simulation
-
+import pandas as pd
 def run_monte_carlo(n_simulations,probas,classes,unplayed,played,old_goal_dif):
     results = []
     
