@@ -1,1 +1,1 @@
-from .plots_function import compare_gdif, compare_ga, compare_gf, compare_points_total, compare_rank, compare_resultats, vizualisation_prediction
+from .plots_function import compare_gdif, compare_ga, compare_gf, compare_points_total, compare_rank, compare_resultats, vizualisation_prediction,plot_all_zones
