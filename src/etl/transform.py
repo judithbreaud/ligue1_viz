@@ -78,7 +78,11 @@ def find_next_opponent(matches_json,team1="Stade Rennais FC 1901"):
     matches_list = matches_json["matches"]
     df= pd.json_normalize(matches_list)
     #restriction to unplayed games
-    df_next = df[df["status"] != "FINISHED"]
+    df_team = df[
+        (df["homeTeam.name"] == team1) |
+        (df["awayTeam.name"] == team1)
+    ]
+    df_next = df_team[df_team["status"] != "FINISHED"]    
     if df_next.empty:
         return None  # Aucun match à venir
     
@@ -98,7 +102,6 @@ def find_next_opponent(matches_json,team1="Stade Rennais FC 1901"):
     away = m["awayTeam.name"].iloc[0]
 
     return away if home == team1 else home
-
 
 def save_next_opponent(opponent_name: str, team_name="Stade Rennais FC 1901", output_path="data/processed/next_opponent.json"):
 
