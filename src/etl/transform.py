@@ -19,7 +19,10 @@ def classement_interactif(matches_json):
    matches_list = matches_json["matches"]
    df_matches = pd.json_normalize(matches_list)
    #restriction to finished games and the important columns
-   df_short=df_matches[df_matches.status=="FINISHED"][["id","status","matchday","season.id","homeTeam.name","awayTeam.name","score.winner","score.fullTime.home","score.fullTime.away"]]
+   df_short1=df_matches[df_matches.status=="FINISHED"][["id","status","matchday","season.id","homeTeam.name","awayTeam.name","score.winner","score.fullTime.home","score.fullTime.away"]]
+   max_md = df_short1["matchday"].max()
+   df_short=df_matches[df_matches.matchday<=max_md][["id","status","matchday","season.id","homeTeam.name","awayTeam.name","score.winner","score.fullTime.home","score.fullTime.away"]]
+
 
    #preparation for long format with a row for each matchday x team.
    #home games
@@ -36,6 +39,7 @@ def classement_interactif(matches_json):
    df_away["is_home"] = False
    #creation of the long format
    df_long = pd.concat([df_home, df_away], ignore_index=True)
+   df_long.fillna(0,inplace=True)
 
    #calculating number of points gained at each day 
    df_long["points"] = df_long.apply(pts, axis=1)
