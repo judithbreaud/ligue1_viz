@@ -15,5 +15,4 @@ __pycache__/
 # Environment & secrets
 .env
 
-# Data (si tu stockes des fichiers volumineux)
-#data/
+notebooks/
