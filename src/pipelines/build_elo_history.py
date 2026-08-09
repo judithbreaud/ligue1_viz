@@ -12,14 +12,16 @@ def main():
     matches_23=load_raw_matches(season_id=2023)
     matches_24=load_raw_matches(season_id=2024)
     matches_25=load_raw_matches(season_id=2025)
+    matches_26_temp=load_raw_matches(season_id=2026)
     rank_22_23 = pd.read_parquet("data/processed/ranking_22_23.parquet")
 
     print("== Data into panda ==")
     df_matches_23 = pd.json_normalize(matches_23["matches"])
     
     df_matches_24 = pd.json_normalize(matches_24["matches"])
-    df_matches_25_temp = pd.json_normalize(matches_25["matches"])
-    df_matches_25 = df_matches_25_temp[df_matches_25_temp.status=="FINISHED"]
+    df_matches_25 = pd.json_normalize(matches_25["matches"])
+    df_matches_26_temp = pd.json_normalize(matches_26_temp["matches"])
+    df_matches_26 = df_matches_26_temp[df_matches_26_temp.status=="FINISHED"]
 
     print("== Saison 23-24 ==")
     elos_2324_start = build_linear_elo_from_ranking(
@@ -40,34 +42,55 @@ def main():
     print("== Saison 25-26 ==")
     elos_2526_start = reset_elos_between_seasons(elos_end_2425,promoted_teams=["FCL","PFC","FCM"])
     history_2526, elos_end_2526 = compute_elo_for_season(df_matches_25, elos_2526_start)
-    last_md = df_matches_25["matchday"].max()
-    next_md = last_md + 1
-    season_2526 = df_matches_25["season.startDate"].iloc[0]
+    print("== Saison 26-27 ==")
+    #Promoted teams à définir
+    elos_2627_start = reset_elos_between_seasons(elos_end_2526,promoted_teams=["LMF","ETR"])
+    if(df_matches_26.shape[0]==0):
+        print("== Concaténer ==")
+        elo_history = pd.concat([history_2324, history_2425, history_2526])
+        
+        os.makedirs("data/processed", exist_ok=True)
+        processed_path = "data/processed/elos_history.parquet"
 
-    history_2526 = append_future_matchday_elos(
-        history_2526,
-        elos_end_2526,
-        season=season_2526,
-        next_matchday=next_md
-    )
-    elos_end_2526_df = elo_dict_to_df(
-    elos_end_2526,season_2526,next_md
-    )
+        print(f"== Saving processed data to {processed_path} ==")
+        elo_history.to_parquet(processed_path, index=False)
+
+        elos_end_path = "data/processed/last_elo.parquet"
+        elos_end_df = elo_dict_to_df(
+            elos_2627_start,df_matches_26_temp["season.startDate"].iloc[0],1
+            )
+        elos_end_df.to_parquet(elos_end_path, index=False)
+    else:
+        history_2627, elos_end_2627 = compute_elo_for_season(df_matches_26, elos_2627_start)
+
+        last_md = df_matches_26["matchday"].max()
+        next_md = last_md + 1
+        season_2627 = df_matches_26["season.startDate"].iloc[0]
+
+        history_2627 = append_future_matchday_elos(
+            history_2627,
+            elos_end_2627,
+            season=season_2627,
+            next_matchday=next_md
+        )
+        elos_end_2627_df = elo_dict_to_df(
+            elos_end_2627,season_2627,next_md
+        )
 
 
-    print("== Concaténer ==")
-    elo_history = pd.concat([history_2324, history_2425, history_2526])
-    
-    print("== Enregistrer ==")
+        print("== Concaténer ==")
+        elo_history = pd.concat([history_2324, history_2425, history_2526,history_2627])
 
-    os.makedirs("data/processed", exist_ok=True)
-    processed_path = "data/processed/elos_history.parquet"
+        print("== Enregistrer ==")
 
-    print(f"== Saving processed data to {processed_path} ==")
-    elo_history.to_parquet(processed_path, index=False)
+        os.makedirs("data/processed", exist_ok=True)
+        processed_path = "data/processed/elos_history.parquet"
 
-    elos_end_path = "data/processed/last_elo.parquet"
-    elos_end_2526_df.to_parquet(elos_end_path, index=False)
+        print(f"== Saving processed data to {processed_path} ==")
+        elo_history.to_parquet(processed_path, index=False)
+
+        elos_end_path = "data/processed/last_elo.parquet"
+        elos_end_2627_df.to_parquet(elos_end_path, index=False)
 
     print("Done.")
 
