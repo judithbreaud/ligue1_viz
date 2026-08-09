@@ -12,8 +12,10 @@ import joblib
 
 def main():
     print("== Loading data ==")
+    matches_2025= load_raw_matches("data/raw/",season_id=2025)
     matches_2024= load_raw_matches("data/raw/",season_id=2024)
     matches_2023= load_raw_matches("data/raw/",season_id=2023)
+    df_matches_25 = pd.json_normalize(matches_2024["matches"])
     df_matches_24 = pd.json_normalize(matches_2024["matches"])
     df_matches_23 = pd.json_normalize(matches_2023["matches"])
     print("== Loading elo history ==")
@@ -21,8 +23,9 @@ def main():
     print("== Preparing data ==")
     X_23,y_23=match_features_train(df_matches_23,history_elo)
     X_24,y_24=match_features_train(df_matches_24,history_elo)
-    X=pd.concat([X_23,X_24],ignore_index=True)
-    y=pd.concat([y_23,y_24],ignore_index=True)
+    X_25,y_25=match_features_train(df_matches_25,history_elo)
+    X=pd.concat([X_23,X_24,X_25],ignore_index=True)
+    y=pd.concat([y_23,y_24,y_25],ignore_index=True)
 
     print("== Preparing pipeline ==")
 
