@@ -43,14 +43,17 @@ def main():
     save_next_opponent(opponent_name=opponent)
 
     print("== Import and repare data for prediction ==")
-    df_matches_25 = pd.json_normalize(matches_json["matches"])
+    df_matches_26 = pd.json_normalize(matches_json["matches"])
     history_elo = pd.read_parquet("data/processed/elos_history.parquet")
 
-    last_elo_md = history_elo[history_elo["season"].str.contains("2025")]["matchday"].max()
+    last_elo_md = history_elo[history_elo["season"].str.contains(SEASON_ID)]["matchday"].max()
     last_finished_md = (
-        df_matches_25[df_matches_25["status"] == "FINISHED"]["matchday"].max()
+        df_matches_26[df_matches_26["status"] == "FINISHED"]["matchday"].max()
     )
     print(f"Last finished matchday: {last_finished_md}")
+    last_finished_md_path="data/processed/last_md.txt"
+    with open(last_finished_md_path, "w") as f:
+        f.write(str(last_finished_md))
     print(f"Last ELO matchday: {last_elo_md}")
     if last_elo_md==last_finished_md+1:
         print("No new matches, exiting pipeline")
@@ -59,7 +62,7 @@ def main():
         #update elo then do prediction
         print("== Update ELO history ==")
 
-        new_history_elo,elos_end=update_elo_history_with_matchday(history_elo,df_matches_25[df_matches_25["matchday"]==last_finished_md])
+        new_history_elo,elos_end=update_elo_history_with_matchday(history_elo,df_matches_26[df_matches_26["matchday"]==last_finished_md])
         print(1)
 
         os.makedirs("data/processed", exist_ok=True)
@@ -68,49 +71,50 @@ def main():
         print(f"== Saving processed data to {processed_path} ==")
         new_history_elo.to_parquet(processed_path, index=False)
 
-        X_pred,y_none,label_pred=match_features_pred(df_matches_25,new_history_elo,last_finished_md+1) 
+        if last_finished_md>=5:
 
-        print("== Import model ==")
-        model=joblib.load("models/match_prediction")
+            X_pred,y_none,label_pred=match_features_pred(df_matches_26,new_history_elo,last_finished_md+1) 
 
-        print(f"Predicting matchday: {last_finished_md + 1}")
-        y_proba = model.predict_proba(X_pred)
-        proba_df = pd.DataFrame(
-            y_proba,
-            columns=model.classes_
-        )
-        label_pred = label_pred.reset_index(drop=True)
-        final_df_pred = pd.concat([label_pred, proba_df], axis=1)
+            print("== Import model ==")
+            model=joblib.load("models/match_prediction")
 
-        print("== Save prediction ==")
+            print(f"Predicting matchday: {last_finished_md + 1}")
+            y_proba = model.predict_proba(X_pred)
+            proba_df = pd.DataFrame(
+                y_proba,
+                columns=model.classes_
+            )
+            label_pred = label_pred.reset_index(drop=True)
+            final_df_pred = pd.concat([label_pred, proba_df], axis=1)
 
-        os.makedirs("data/processed", exist_ok=True)
-        processed_pred_path = "data/processed/next_matchday_prediction.parquet"
+            print("== Save prediction ==")
 
-        final_df_pred.to_parquet(processed_pred_path, index=False)
+            os.makedirs("data/processed", exist_ok=True)
+            processed_pred_path = "data/processed/next_matchday_prediction.parquet"
 
-
+            final_df_pred.to_parquet(processed_pred_path, index=False)
 
     else: 
         #there is an error 
         print("There is an error")
         new_history_elo=history_elo
-    
-    print("== Monte carlo prediction ==")
 
-    model = joblib.load("models/match_prediction_MC")
+    if last_finished_md>=20:
+        print("== Monte carlo prediction ==")
 
-    rank_probs = run_season_monte_carlo(
-        df_matches=df_matches_25,
-        elo_history=new_history_elo,
-        model=model,
-        standings_path="data/processed/standings_long.parquet",
-        n_simulations=10000
-    )
+        model = joblib.load("models/match_prediction_MC")
 
-    rank_probs.to_parquet(
-        "data/processed/monte_carlo_rank_probs.parquet"
-    )
+        rank_probs = run_season_monte_carlo(
+            df_matches=df_matches_26,
+            elo_history=new_history_elo,
+            model=model,
+            standings_path="data/processed/standings_long.parquet",
+            n_simulations=10000
+        )
+
+        rank_probs.to_parquet(
+            "data/processed/monte_carlo_rank_probs.parquet"
+        )
 
 
 
