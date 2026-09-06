@@ -9,13 +9,18 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 st.markdown("<style>div.block-container{padding-top:2rem;}</style>", unsafe_allow_html=True)
-
+with open("data/processed/last_md.txt", "r") as f:
+    last_finished_md = int(f.read())
 st.title("Prédiction des matchs de la prochaine journée")
-df = pd.read_parquet("data/processed/next_matchday_prediction.parquet")
 
-from src.viz import vizualisation_prediction
-fig=vizualisation_prediction(df)
-st.plotly_chart(fig)
+if last_finished_md<6:
+    st.text("Disponible après la J5")
+else:
+    df = pd.read_parquet("data/processed/next_matchday_prediction.parquet")
+
+    from src.viz import vizualisation_prediction
+    fig=vizualisation_prediction(df)
+    st.plotly_chart(fig)
 
 
 
