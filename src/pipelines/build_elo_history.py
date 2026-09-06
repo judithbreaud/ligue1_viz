@@ -57,7 +57,7 @@ def main():
 
         elos_end_path = "data/processed/last_elo.parquet"
         elos_end_df = elo_dict_to_df(
-            elos_2627_start,df_matches_26_temp["season.startDate"].iloc[0],1
+            elos_2627_start,df_matches_26_temp["season.startDate"].iloc[0],0
             )
         elos_end_df.to_parquet(elos_end_path, index=False)
     else:

@@ -8,9 +8,12 @@ from src.simulation import run_monte_carlo, compute_rank_probabilities
 from src.etl import load_raw_matches
 from src.simulation import run_season_monte_carlo
 import joblib
+import sys
 
 COMPETITION_ID="FL1" #ligue 1
-SEASON_ID="2025"
+SEASON_ID="2026"
+
+#should add an ifelse so the predictions are only done if last matchday is at least 5
 
 def main():
     print("== Fetching data from API ==")
@@ -20,6 +23,11 @@ def main():
     raw_path=save_raw_matches(matches_json)
 
     print(f"== Raw data saved at: {raw_path} ==")
+
+    df_match=pd.json_normalize(matches_json["matches"])
+    df_match = df_match[df_match["status"]=="FINISHED"]
+    if(df_match.shape[0]==0):
+        sys.exit
 
     print("== Transforming data ==")
     df = classement_interactif(matches_json)
